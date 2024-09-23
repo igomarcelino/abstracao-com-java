@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="bancoJDBC">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/biblioteca/bancoJDBC.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
