@@ -1,5 +1,6 @@
 package io.igomarcelino.github.desafioDioAbastraccao.dominio;
 
+import java.time.LocalDate;
 import java.util.*;
 
 public class Sistema {
@@ -20,6 +21,7 @@ public class Sistema {
      * Tela principal do sistema , contem a tela de cadastros e alugueis
      */
     protected void telaPrincipal() {
+        cadastrarMaster();
         menu();
     }
 
@@ -35,15 +37,26 @@ public class Sistema {
             System.out.println("[ 4 ] Relatorios");
             System.out.println("[ 5 ] Sair");
             System.out.print("opcao: ");
-            opcao = scanner.nextInt();
-            switch (opcao) {
-                case 1:
-                    telaCadastroFuncionario();
-                    break;
-                case 2 :
-                    telaCadadstro();
-                case 5:
-                    System.out.println("Saindo do sistema");
+            try
+            {
+                opcao = scanner.nextInt();
+                switch (opcao) {
+                    case 1:
+                        telaCadastroFuncionario();
+                        break;
+                    case 2 :
+                        telaCadadstro();
+                        break;
+                    case 3 :
+                        realizarAluguel();
+                        break;
+                    case 5:
+                        System.out.println("Saindo do sistema");
+                        break;
+                }
+
+            }catch (InputMismatchException e){
+                System.out.println("Opcao invalida, informar apenas numeros!");
             }
         } while (opcao != 5);
 
@@ -63,8 +76,19 @@ public class Sistema {
                     System.out.print("Nome: ");
                     funcionario.setNome(scanner.next());
                     System.out.print("CPF: ");
-                    funcionario.setCpf(scanner.next());
-                    adicionarPessoas(funcionario);
+                    String cpf = scanner.next();
+                    boolean checaCpf = verificarCpfJaCadastrado(cpf);
+                    if (!checaCpf){
+                        // Verifica se o cpf contem apenas numeros e tem um tamnho de 11 caracteres
+                        while (!cpf.matches("\\d+$") && cpf.length() == 11){
+                            System.out.println("CPF invalido!");
+                            System.out.print("CPF: ");
+                        }
+                        funcionario.setCpf(cpf);
+                        adicionarPessoas(funcionario);
+                    }else {
+                        System.out.println("Pessoa ja cadastrada!");
+                    }
                     break;
                 case 2:
                     System.out.println("Voltando ao menu...");
@@ -76,61 +100,77 @@ public class Sistema {
     private void telaCadadstro() {
         int opcao;
         // informar o funcionario que esta cadastrando o cliente
-        System.out.print("Informe o CPF do funcionario de cadastro: ");
-        String cpfFuncionario = scanner.next();
-        //Verifica se o funcionario existe
-        Funcionario funcionarioCadastro = (Funcionario) pessoaList.stream().
-                filter(pessoa -> pessoa.getCpf().equalsIgnoreCase(cpfFuncionario)).
-                findAny().
-                get();
-        // verifica se o funcionario foi encontrado e entra no menu
-
-        if (funcionarioCadastro != null) {
-            do {
-                System.out.println("==== Cadastro ====");
-                System.out.print("[ 1 ] Cadastrar cliente\n[ 2 ] Cadastrar Jogo\n[ 3 ] Sair\nopcao: ");
-                opcao = scanner.nextInt();
-                switch (opcao) {
-                    case 1:
-                        Cliente cliente = new Cliente();
-                        System.out.println("==== Cadastro de clientes ====");
-                        System.out.print("CPF: ");
-                        cliente.setCpf(scanner.next());
-                        System.out.print("Nome: ");
-                        cliente.setNome(scanner.next());
-                        System.out.print("Telefone: ");
-                        cliente.setTelefone(scanner.next());
-                        System.out.print("email: ");
-                        cliente.setEmail(scanner.next());
-                        System.out.print("Endereco: ");
-                        cliente.setEndereco(scanner.next());
-                        cliente.setFuncionarioCadastro(funcionarioCadastro);
-                        adicionarPessoas(cliente);
-                        System.out.println("Cadastro realizado");
-                        break;
-                    case 2:
-                        Jogo jogo = new Jogo();
-                        System.out.println("=== Cadastro de Jogos === ");
-                        System.out.print("Nome: ");
-                        jogo.setNome(scanner.next());
-                        System.out.print("Fabricante: ");
-                        jogo.setFabricante(scanner.next());
-                        System.out.print("Total de jogadores: ");
-                        jogo.setTotalJogadores(scanner.nextInt());
-                        System.out.print("Ano de publicacao: ");
-                        jogo.setAnoPublicacao(scanner.nextInt());
-                        System.out.print("Estoque: ");
-                        jogo.setQuantidadeDisponivel(scanner.nextInt());
-                        jogo.setFuncionario(funcionarioCadastro);
-                        adicionarJogos(jogo);
-                    case 3:
-                        System.out.println("Voltando ao menu...");
-                        break;
-                    default:
-                        System.out.println("Informe uma opcao");
-                }
-            } while (opcao != 3);
+        System.out.print("==== Identificacao do funcionario ====");
+        System.out.print("\nCPF: ");
+        try{
+            String cpfFuncionario = scanner.next();
+            //Verifica se o funcionario existe
+            Funcionario funcionarioCadastro = (Funcionario) pessoaList.stream().
+                    filter(pessoa -> pessoa.getCpf().equalsIgnoreCase(cpfFuncionario)).
+                    findAny().
+                    get();
+            // verifica se o funcionario foi encontrado e entra no menu
+            if (funcionarioCadastro != null) {
+                do {
+                    System.out.println("==== Cadastro ====");
+                    System.out.print("[ 1 ] Cadastrar cliente\n[ 2 ] Cadastrar Jogo\n[ 3 ] Sair\nopcao: ");
+                    opcao = scanner.nextInt();
+                    switch (opcao) {
+                        case 1:
+                            Cliente cliente = new Cliente();
+                            System.out.println("==== Cadastro de clientes ====");
+                            System.out.print("CPF: ");
+                            String cpf = scanner.next();
+                            boolean checaCPF = verificarCpfJaCadastrado(cpf);
+                            if (!checaCPF){
+                                while (!cpf.matches("\\d+$") && cpf.length() == 11){
+                                    System.out.println("CPF invalido!");
+                                    System.out.print("CPF: ");
+                                    cpf = scanner.next();
+                                }
+                                cliente.setCpf(cpf);
+                                System.out.print("Nome: ");
+                                cliente.setNome(scanner.next());
+                                System.out.print("Telefone: ");
+                                cliente.setTelefone(scanner.next());
+                                System.out.print("email: ");
+                                cliente.setEmail(scanner.next());
+                                System.out.print("Endereco: ");
+                                cliente.setEndereco(scanner.next());
+                                cliente.setFuncionarioCadastro(funcionarioCadastro);
+                                adicionarPessoas(cliente);
+                                System.out.println("Cadastro realizado");
+                            }else {
+                                System.out.println("Pessoa ja cadastrada!");
+                            }
+                            break;
+                        case 2:
+                            Jogo jogo = new Jogo();
+                            System.out.println("=== Cadastro de Jogos === ");
+                            System.out.print("Nome: ");
+                            jogo.setNome(scanner.next());
+                            System.out.print("Fabricante: ");
+                            jogo.setFabricante(scanner.next());
+                            System.out.print("Total de jogadores: ");
+                            jogo.setTotalJogadores(scanner.nextInt());
+                            System.out.print("Ano de publicacao: ");
+                            jogo.setAnoPublicacao(scanner.nextInt());
+                            System.out.print("Estoque: ");
+                            jogo.setQuantidadeDisponivel(scanner.nextInt());
+                            jogo.setFuncionario(funcionarioCadastro);
+                            adicionarJogos(jogo);
+                        case 3:
+                            System.out.println("Voltando ao menu...");
+                            break;
+                        default:
+                            System.out.println("Opcao invalida!");
+                    }
+                } while (opcao != 3);
+            }
+        }catch (NoSuchElementException e){
+            System.out.println("Funcionario nao localizado, error: " + e.getMessage());
         }
+
 
     }
 
@@ -138,9 +178,46 @@ public class Sistema {
     /**
      * Metodo responsavel pelo cadastro de alugueis no lista de aluguel
      */
-    public void cadastrarAluguel(Aluguel aluguel) {
-        this.aluguelList.add(aluguel);
-        System.out.println(aluguelList);
+    public void realizarAluguel() {
+        int opcao;
+        // informar o funcionario que esta cadastrando o cliente
+        System.out.print("==== Identificacao do funcionario ====");
+        System.out.print("\nCPF: ");
+        try {
+            String cpfFuncionario = scanner.next();
+            //Verifica se o funcionario existe
+            Funcionario funcionarioCadastro = (Funcionario) pessoaList.stream().
+                    filter(pessoa -> pessoa.getCpf().equalsIgnoreCase(cpfFuncionario)).
+                    findAny().
+                    get();
+            if (funcionarioCadastro != null){
+                System.out.println("==== Aluguel de jogos ====");
+                Jogo jogoAluguel = new Jogo();
+                Cliente clienteAluguel = new Cliente();
+                System.out.print("Nome do jogoAluguel: ");
+                String jogoNome = scanner.next();
+                jogoAluguel = procucarJogo(jogoNome);
+                if (jogoAluguel != null){
+                    System.out.print("CPF do cliente: ");
+                    String cpfCliente = scanner.next();
+                    clienteAluguel = (Cliente) procurarPessoa(cpfCliente);
+                    if (clienteAluguel != null){
+                        Aluguel aluguel = new Aluguel();
+                        aluguel.alugarJogo(clienteAluguel,jogoAluguel,"Alugado", LocalDate.now(),funcionarioCadastro,10.00);
+                        aluguelList.add(aluguel);
+                        System.out.println("Aluguel de n "+ aluguel.getCodigo() + " realizado com sucesso!");
+                    }else {
+                        System.out.println("Cliente nao localizado!");
+                    }
+                }else {
+                    System.out.println("Jogo nao localizado");
+                }
+            }
+
+        }catch (NoSuchElementException e){
+            System.out.println("Funcionario nao localizado, error: " + e.getMessage());
+        }
+
     }
 
     /**
@@ -170,6 +247,39 @@ public class Sistema {
         System.out.println(aluguelList);
     }
 
+    /**
+     * Verifica se a pessoa ja nao foi cadastrada no sistema.
+     * */
+    public boolean verificarCpfJaCadastrado(String cpf){
+        return pessoaList.stream().anyMatch(cpfCadastrado -> cpfCadastrado.getCpf().equalsIgnoreCase(cpf));
+    }
+    public Pessoa procurarPessoa(String cpf){
+        return pessoaList.stream().filter(cpfPessoa-> cpfPessoa.getCpf().equalsIgnoreCase(cpf)).findAny().get();
+    }
+    public Jogo procucarJogo(String titulo){
+        return jogoList.stream().filter(nomeJogo -> nomeJogo.getNome().equalsIgnoreCase(titulo)).findAny().get();
+    }
+
+    public  void cadastrarMaster(){
+        Funcionario funcionario = new Funcionario("master","999999");
+        adicionarPessoas(funcionario);
+        Cliente cliente = new Cliente();
+        cliente.setNome("teste");
+        cliente.setCpf("123");
+        cliente.setEndereco("Rua jua");
+        cliente.setTelefone("13899882");
+        cliente.setEmail("jjes@jjdasdsa.com");
+        cliente.setFuncionarioCadastro(funcionario);
+        adicionarPessoas(cliente);
+        Jogo jogo = new Jogo();
+        jogo.setNome("age");
+        jogo.setFabricante("Micro");
+        jogo.setAnoPublicacao(1995);
+        jogo.setQuantidadeDisponivel(10);
+        jogo.setTotalJogadores(10);
+        jogo.setFuncionario(funcionario);
+        jogoList.add(jogo);
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

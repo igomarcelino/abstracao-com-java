@@ -13,6 +13,10 @@ public class Aluguel {
     private Funcionario funcionario;
     private double valor;
 
+    public int getCodigo() {
+        return codigo;
+    }
+
     public Aluguel() {
         this.codigo = codigoSequencial++;
         this.dataDevolucao = LocalDate.now().plusDays(7);
