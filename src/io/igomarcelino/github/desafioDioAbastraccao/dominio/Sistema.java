@@ -34,8 +34,9 @@ public class Sistema {
             System.out.println("[ 1 ] Cadastro Funcionario");
             System.out.println("[ 2 ] Cadastros");
             System.out.println("[ 3 ] Aluguel de Jogos");
-            System.out.println("[ 4 ] Relatorios");
-            System.out.println("[ 5 ] Sair");
+            System.out.println("[ 4 ] Devolucao de Jogos");
+            System.out.println("[ 5 ] Relatorios");
+            System.out.println("[ 6 ] Sair");
             System.out.print("opcao: ");
             try
             {
@@ -61,7 +62,7 @@ public class Sistema {
             }catch (InputMismatchException e){
                 System.out.println("Opcao invalida, informar apenas numeros!");
             }
-        } while (opcao != 5);
+        } while (opcao != 6);
 
 
     }
@@ -205,8 +206,9 @@ public class Sistema {
                     if (clienteAluguel != null){
                         Aluguel aluguel = new Aluguel();
                         aluguel.alugarJogo(clienteAluguel,jogoAluguel,"Alugado", LocalDate.now(),funcionarioCadastro,10.00);
-                        aluguelList.add(aluguel);
                         System.out.println("Aluguel de n "+ aluguel.getCodigo() + " realizado com sucesso!");
+                        alterarEstoqueJogoAlguel(jogoAluguel);
+
                     }else {
                         System.out.println("Cliente nao localizado!");
                     }
@@ -302,6 +304,23 @@ public class Sistema {
     }
     public Jogo procucarJogo(String titulo){
         return jogoList.stream().filter(nomeJogo -> nomeJogo.getNome().equalsIgnoreCase(titulo)).findAny().get();
+    }
+
+    /**
+     * Aqui estamos recebendo um objeto do tipo jogo e alterando sua quantidade em estoque
+     * */
+    public void alterarEstoqueJogoAlguel(Jogo jogo){
+        jogoList.stream().
+                filter(jogoAlugado1 -> jogoAlugado1.equals(jogo)).
+                limit(1).
+                forEach(ajustaEstoque -> ajustaEstoque.setQuantidadeDisponivel(ajustaEstoque.getQuantidadeDisponivel() -1 ));
+    }
+
+    public void alterarEstoqueJogoDevolucao(Jogo jogo){
+        jogoList.stream().
+                filter(jogoAlugado1 -> jogoAlugado1.equals(jogo)).
+                limit(1).
+                forEach(ajustaEstoque -> ajustaEstoque.setQuantidadeDisponivel(ajustaEstoque.getQuantidadeDisponivel() + 1 ));
     }
 
     public  void cadastrarMaster(){
