@@ -50,6 +50,9 @@ public class Sistema {
                     case 3 :
                         realizarAluguel();
                         break;
+                    case 4:
+                        relatorios();
+                        break;
                     case 5:
                         System.out.println("Saindo do sistema");
                         break;
@@ -170,8 +173,6 @@ public class Sistema {
         }catch (NoSuchElementException e){
             System.out.println("Funcionario nao localizado, error: " + e.getMessage());
         }
-
-
     }
 
 
@@ -221,6 +222,37 @@ public class Sistema {
     }
 
     /**
+     * Metodo que chama os relatorios
+     * */
+
+    public void relatorios(){
+        int opcao;
+        do {
+            System.out.print("=== Relatorios ===");
+            System.out.print("\n[ 1 ] imprimir pessoas");
+            System.out.print("\n[ 2 ] imprimir jogos");
+            System.out.print("\n[ 3 ] imprimir alugueis");
+            System.out.print("\n[ 4 ] sair");
+            System.out.print("\nOpcao: ");
+            opcao = scanner.nextInt();
+            switch (opcao){
+                case 1:
+                    imprimirPessoas();
+                    break;
+                case 2:
+                    imprimirJogos();
+                    break;
+                case 3:
+                    imprimirAlugueis();
+                    break;
+                case 4:
+                    System.out.println("Voltando ao menu principal...");
+
+            }
+        }while (opcao != 4);
+    }
+
+    /**
      * Metodo responsavel por adicionar pessoas na lista de pessoas
      */
     private void adicionarPessoas(Pessoa pessoa) {
@@ -236,15 +268,27 @@ public class Sistema {
     }
 
     public void imprimirPessoas() {
-        System.out.println(pessoaList);
+        if (!pessoaList.isEmpty()){
+            pessoaList.stream().forEach(pessoa -> System.out.println(pessoa+ "\n"));
+        }else {
+            System.out.println("Lista de pessoas esta vazia!");
+        }
     }
 
     public void imprimirJogos() {
-        System.out.println(jogoList);
+        if (!jogoList.isEmpty()){
+            jogoList.stream().forEach(jogo -> System.out.println(jogo + "\n"));
+        }else {
+            System.out.println("Lista de Jogos esta vazia!");
+        }
     }
 
     public void imprimirAlugueis() {
-        System.out.println(aluguelList);
+        if (!aluguelList.isEmpty()){
+            aluguelList.stream().forEach(aluguel-> System.out.println(aluguel + "\n"));
+        }else {
+            System.out.println("\nLista de alugueis esta vazia!\n");
+        }
     }
 
     /**
