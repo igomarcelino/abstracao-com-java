@@ -31,6 +31,21 @@ public class Aluguel {
         this.valor = valor;
     }
 
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public Jogo getJogo() {
+        return jogo;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     @Override
     public String toString() {
