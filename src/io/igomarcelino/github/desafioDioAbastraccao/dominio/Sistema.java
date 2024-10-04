@@ -1,7 +1,9 @@
 package io.igomarcelino.github.desafioDioAbastraccao.dominio;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Sistema {
     private List<Pessoa> pessoaList;
@@ -38,7 +40,7 @@ public class Sistema {
             System.out.println("[ 5 ] Relatorios");
             System.out.println("[ 6 ] Sair");
             System.out.print("\nopcao: ");
-            try {
+
                 opcao = scanner.nextInt();
                 switch (opcao) {
                     case 1:
@@ -59,11 +61,9 @@ public class Sistema {
                     case 6:
                         System.out.println("Saindo do sistema");
                         break;
+                    default:
+                        System.out.println("Opcao Invalida, informar apenas numeros");
                 }
-
-            } catch (InputMismatchException e) {
-                System.out.println("Opcao invalida, informar apenas numeros!");
-            }
         } while (opcao != 6);
 
 
@@ -129,11 +129,13 @@ public class Sistema {
                             String cpf = scanner.next();
                             boolean checaCPF = verificarCpfJaCadastrado(cpf);
                             if (!checaCPF) {
-                                while (!cpf.matches("\\d+$") && cpf.length() == 11) {
+                                while (!(cpf.matches("\\d+$") && cpf.length() == 11)) {
                                     System.out.println("CPF invalido!");
                                     System.out.print("CPF: ");
                                     cpf = scanner.next();
                                 }
+//  TODO Corrigir a entrada de clientes
+
                                 cliente.setCpf(cpf);
                                 System.out.print("Nome: ");
                                 cliente.setNome(scanner.next());
@@ -142,7 +144,7 @@ public class Sistema {
                                 System.out.print("email: ");
                                 cliente.setEmail(scanner.next());
                                 System.out.print("Endereco: ");
-                                cliente.setEndereco(scanner.next());
+                                cliente.setEndereco(scanner.nextLine());
                                 cliente.setFuncionarioCadastro(funcionarioCadastro);
                                 adicionarPessoas(cliente);
                                 System.out.println("Cadastro realizado");
@@ -187,72 +189,94 @@ public class Sistema {
         // informar o funcionario que esta cadastrando o cliente
         System.out.print("==== Identificacao do funcionario ====");
         System.out.print("\nCPF: ");
-        try {
+
             String cpfFuncionario = scanner.next();
             //Verifica se o funcionario existe
-            Funcionario funcionarioCadastro = (Funcionario) pessoaList.stream().
-                    filter(pessoa -> pessoa.getCpf().equalsIgnoreCase(cpfFuncionario)).
-                    findAny().
-                    get();
-            if (funcionarioCadastro != null) {
+            Optional<Pessoa> funcionarioCadastro =  pessoaList.stream().
+                    filter(pessoa -> pessoa.getCpf().equalsIgnoreCase(cpfFuncionario)).findFirst();
+            if (funcionarioCadastro.isPresent()) {
                 System.out.println("==== Aluguel de jogos ====");
-                Jogo jogoAluguel = new Jogo();
-                Cliente clienteAluguel = new Cliente();
-                System.out.print("Nome do jogoAluguel: ");
+                Optional<Jogo> jogoAluguel;
+                Optional<Pessoa> clienteAluguel;
+                System.out.print("Nome do jogo: ");
                 String jogoNome = scanner.next();
                 jogoAluguel = procucarJogo(jogoNome);
-                if (jogoAluguel != null) {
-                    System.out.print("CPF do cliente: ");
-                    String cpfCliente = scanner.next();
-                    clienteAluguel = (Cliente) procurarPessoa(cpfCliente);
-                    if (clienteAluguel != null) {
-                        Aluguel aluguel = new Aluguel();
-                        aluguel.alugarJogo(clienteAluguel, jogoAluguel, "Alugado", LocalDate.now(), funcionarioCadastro, 10.00);
-                        aluguelList.add(aluguel);
-                        System.out.println("Aluguel de n " + aluguel.getCodigo() + " realizado com sucesso!");
-                        alterarEstoqueJogoAlguel(jogoAluguel);
-
+                    if (jogoAluguel.isPresent()) {
+                        System.out.print("CPF do cliente: ");
+                        String cpfCliente = scanner.next();
+                        clienteAluguel =  procurarPessoa(cpfCliente);
+                        if (clienteAluguel.isPresent()) {
+                            // verifica se o cliente nao tem jogo com aluguel atrasado
+                            List<Aluguel> aluguelAtrasado = aluguelList.stream().
+                                    filter(aluguel -> aluguel.getCliente().equals(clienteAluguel)).
+                                    filter(aluguel -> aluguel.getStatus().equalsIgnoreCase("atrasado")).
+                                    collect(Collectors.toList());
+                            if(aluguelAtrasado.isEmpty()){
+                                Aluguel aluguel = new Aluguel();
+                                aluguel.alugarJogo((Cliente) clienteAluguel.get(), jogoAluguel.get(), "Alugado", LocalDate.now(),(Funcionario) funcionarioCadastro.get(), 10.00);
+                                aluguelList.add(aluguel);
+                                System.out.println("Aluguel de n " + aluguel.getCodigo() + " realizado com sucesso!");
+                                alterarEstoqueJogoAlguel(jogoAluguel.get());
+                            }else {
+                                System.out.println("Cliente + " + clienteAluguel.get().getNome() + " possui alugueis em aberto");
+                                System.out.println("==== ALUGUEIS EM ABERTO ====");
+                                System.out.println(aluguelAtrasado);
+                            }
+                        } else {
+                            System.out.println("Cliente nao localizado!");
+                        }
                     } else {
-                        System.out.println("Cliente nao localizado!");
+                        System.out.println("Jogo nao localizado");
                     }
-                } else {
-                    System.out.println("Jogo nao localizado");
-                }
+            }else {
+                System.out.println("Funcionario nao localizado");
             }
-
-        } catch (NoSuchElementException e) {
-            System.out.println("Funcionario nao localizado, error: " + e.getMessage());
-        }
 
     }
 
+    /**
+     * Metodo realiza a devolucao de alugueis, alterando o status para devolvido e devolvendo o jogo para o estoque
+     * */
     public void realizarDevolucao() {
         System.out.println("==== DEVOLUCAO DE JOGOS ====");
         System.out.println("Dados do cliente ");
         System.out.print("CPF: ");
         String cpfCliente = scanner.next();
-        Cliente clienteDevolucao = (Cliente) pessoaList.stream().
-                filter(pessoa -> pessoa.getCpf().equalsIgnoreCase(cpfCliente)).
-                findAny().
-                get();
-        if (clienteDevolucao != null) {
-            System.out.println("Lista de alugueis em abertos do cliente " + clienteDevolucao.getNome());
-            aluguelList.stream().
+        Optional<Pessoa> clienteDevolucao;
+        clienteDevolucao = procurarPessoa(cpfCliente);
+        // realiza a verificacao de clientes
+        if (clienteDevolucao.isPresent()) {
+            System.out.println("Lista de alugueis em abertos do cliente " + clienteDevolucao.get().getNome());
+            List<Aluguel> alugueisEmAberto = new ArrayList<>();
+            alugueisEmAberto = aluguelList.stream().
                     filter(aluguel -> aluguel.getCliente().getCpf().equalsIgnoreCase(cpfCliente)).
                     filter(aluguel -> aluguel.getStatus().equalsIgnoreCase("alugado")).
-                    forEach(aluguel -> System.out.println(aluguel + "\n"));
-            System.out.println("informe o numero do aluguel");
-            int opcao = scanner.nextInt();
-            aluguelList.stream().
-                    filter(aluguel -> aluguel.getCodigo() == opcao).
-                    limit(1).forEach(aluguel -> aluguel.setStatus("devolvido"));
-
-            Jogo jogoAlugado = aluguelList.stream().
-                    filter(aluguel -> aluguel.getStatus().equalsIgnoreCase("devolvido")).
-                    findAny().
-                    get().
-                    getJogo();
-            alterarEstoqueJogoDevolucao(jogoAlugado);
+                    collect(Collectors.toList());
+            // verifica se possui algum aluguel em aberto
+            if (!alugueisEmAberto.isEmpty()){
+                System.out.println("========= Lista de Alugueis =========");
+                System.out.println("");
+                System.out.println(alugueisEmAberto);
+                System.out.println("");
+                System.out.println("======================================");
+                System.out.print("Numero do alguel para devolucao: ");
+                int opcao = scanner.nextInt();
+                aluguelList.stream().
+                        filter(aluguel -> aluguel.getCodigo() == opcao).
+                        limit(1).forEach(aluguel -> aluguel.setStatus("devolvido"));
+                Jogo jogoAlugado = aluguelList.stream().
+                        filter(aluguel -> aluguel.getStatus().equalsIgnoreCase("devolvido")).
+                        findAny().
+                        get().
+                        getJogo();
+                alterarEstoqueJogoDevolucao(jogoAlugado);
+            }else {
+                System.out.println("========= Lista de Alugueis =========");
+                System.out.println("");
+                System.out.println("Cliente nao possui alugueis em aberto");
+                System.out.println("");
+                System.out.println("======================================");
+            }
         }
     }
 
@@ -320,7 +344,17 @@ public class Sistema {
 
     public void imprimirAlugueis() {
         if (!aluguelList.isEmpty()) {
-            aluguelList.stream().forEach(aluguel -> System.out.println(aluguel + "\n"));
+            System.out.println("========== Relatorio de Alugueis =========");
+            aluguelList.stream().forEach(aluguel -> {
+                System.out.println("Codigo aluguel: " + aluguel.getCodigo());
+                System.out.println("Cliente : " + aluguel.getCliente().getNome());
+                System.out.println("Jogo: " + aluguel.getJogo().getNome());
+                System.out.println("Status : " + aluguel.getStatus());
+                System.out.println("Data : " + aluguel.getDataAluguel());
+                System.out.println("Data Devolucao :" + aluguel.getDataDevolucao());
+                System.out.println("Funcionario : " + aluguel.getFuncionario().getNome());
+                System.out.println("============================================");
+            });
         } else {
             System.out.println("\nLista de alugueis esta vazia!\n");
         }
@@ -333,12 +367,12 @@ public class Sistema {
         return pessoaList.stream().anyMatch(cpfCadastrado -> cpfCadastrado.getCpf().equalsIgnoreCase(cpf));
     }
 
-    public Pessoa procurarPessoa(String cpf) {
-        return pessoaList.stream().filter(cpfPessoa -> cpfPessoa.getCpf().equalsIgnoreCase(cpf)).findAny().get();
+    public Optional<Pessoa> procurarPessoa(String cpf) {
+        return pessoaList.stream().filter(cpfPessoa -> cpfPessoa.getCpf().equalsIgnoreCase(cpf)).findAny();
     }
 
-    public Jogo procucarJogo(String titulo) {
-        return jogoList.stream().filter(nomeJogo -> nomeJogo.getNome().equalsIgnoreCase(titulo)).findAny().get();
+    public Optional<Jogo> procucarJogo(String titulo) {
+        return jogoList.stream().filter(nomeJogo -> nomeJogo.getNome().equalsIgnoreCase(titulo)).findFirst();
     }
 
     /**

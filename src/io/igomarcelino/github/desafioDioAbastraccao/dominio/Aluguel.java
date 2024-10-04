@@ -43,6 +43,18 @@ public class Aluguel {
         return status;
     }
 
+    public Funcionario getFuncionario() {
+        return funcionario;
+    }
+
+    public LocalDate getDataDevolucao() {
+        return dataDevolucao;
+    }
+
+    public LocalDate getDataAluguel() {
+        return dataAluguel;
+    }
+
     public void setStatus(String status) {
         this.status = status;
     }
