@@ -130,21 +130,29 @@ public class Sistema {
                             boolean checaCPF = verificarCpfJaCadastrado(cpf);
                             if (!checaCPF) {
                                 while (!(cpf.matches("\\d+$") && cpf.length() == 11)) {
-                                    System.out.println("CPF invalido!");
-                                    System.out.print("CPF: ");
+                                    System.out.print("CPF invalido!");
+                                    System.out.print("\nCPF: ");
                                     cpf = scanner.next();
-                                }
-//  TODO Corrigir a entrada de clientes
 
+                                }
                                 cliente.setCpf(cpf);
+                                // limpa o buffer do teclado
+                                scanner.nextLine();
                                 System.out.print("Nome: ");
-                                cliente.setNome(scanner.next());
+                                String nome = scanner.nextLine();
+                                cliente.setNome(nome);
+                                scanner.nextLine();
                                 System.out.print("Telefone: ");
-                                cliente.setTelefone(scanner.next());
+                                String telefone = scanner.next();
+                                cliente.setTelefone(telefone);
+                                scanner.nextLine();
                                 System.out.print("email: ");
-                                cliente.setEmail(scanner.next());
+                                String email = scanner.next();
+                                cliente.setEmail(email);
+                                scanner.nextLine();
                                 System.out.print("Endereco: ");
-                                cliente.setEndereco(scanner.nextLine());
+                                String endereco = scanner.nextLine().toLowerCase();
+                                cliente.setEndereco(endereco);
                                 cliente.setFuncionarioCadastro(funcionarioCadastro);
                                 adicionarPessoas(cliente);
                                 System.out.println("Cadastro realizado");
