@@ -1,4 +1,4 @@
-# Abstracao com java
+s# Abstracao com java
 
 ## Descrição
 Este projeto serve para treinar a capacidade de abstracao utilizando a linguagem de programacao Java, para esse projeto sera tratado um conteudo da materia de banco de dados da universidade UNICESUMAR.
@@ -78,9 +78,9 @@ Aluguel Aluguel
 }
 
 SISTEMA{
-List<Pessoa> pessoaList
-List<Jogo> jogoList
-List<Aluguel> aluguelList
+ListPessoa pessoaList
+ListJogo jogoList
+ListAluguel aluguelList
 Scanner scanner
 }
 
