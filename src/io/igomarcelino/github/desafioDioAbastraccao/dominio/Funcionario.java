@@ -8,6 +8,7 @@ public class Funcionario extends Pessoa {
     private String funcao;
 
     public Funcionario(){
+        this.funcao = "Atendente";
     }
     public Funcionario(String nome, String cpf) {
         super(nome, cpf);
@@ -29,8 +30,8 @@ public class Funcionario extends Pessoa {
     public String toString() {
         return "Funcionario{" +
                 "codigo=" + getCodigo() +" "+
-                "cpf='" + getCpf() + '\'' +
                 "nome='" + getNome() + '\'' +
+                "cpf='" + getCpf() + '\'' +
                 "funcao='" + funcao + '\'' +
                 '}';
     }

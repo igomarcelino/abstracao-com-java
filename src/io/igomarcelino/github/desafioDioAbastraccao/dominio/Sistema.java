@@ -78,9 +78,11 @@ public class Sistema {
             switch (opcao) {
                 case 1:
                     Funcionario funcionario = new Funcionario();
+                    scanner.nextLine();
                     System.out.println("==== Cadastro de Funcionario ====");
                     System.out.print("Nome: ");
-                    funcionario.setNome(scanner.next());
+                    funcionario.setNome(scanner.nextLine());
+                    scanner.nextLine();
                     System.out.print("CPF: ");
                     String cpf = scanner.next();
                     boolean checaCpf = verificarCpfJaCadastrado(cpf);
@@ -361,7 +363,7 @@ public class Sistema {
                 System.out.println("Data : " + aluguel.getDataAluguel());
                 System.out.println("Data Devolucao :" + aluguel.getDataDevolucao());
                 System.out.println("Funcionario : " + aluguel.getFuncionario().getNome());
-                System.out.println("============================================");
+                System.out.println("============================================\n");
             });
         } else {
             System.out.println("\nLista de alugueis esta vazia!\n");
