@@ -29,7 +29,7 @@ Para cadastrar clientes, o atendente registra o CPF, nome completo, telefone, en
 
 ## Entidades mapeadas
 
-**Loja**, **Funcionario**, **Jogo**, **Cliente** e **Aluguel**
+**Loja**, **Funcionario**, **Jogo**, **Cliente**, **Aluguel** e **Sistema**
 ## Atributos por entidade
 
 ```mermaid
