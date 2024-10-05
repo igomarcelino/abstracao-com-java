@@ -75,8 +75,15 @@ Funcionario funcionario
 Cliente cliente
 Cliente cliente
 Aluguel Aluguel
-
 }
+
+SISTEMA{
+List<Pessoa> pessoaList
+List<Jogo> jogoList
+List<Aluguel> aluguelList
+Scanner scanner
+}
+
 ```
 
 ### Metodos
